@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
-using Infrastructure.Interfaces;
-using Infrastructure.Repositories;
+using Infrastructure.Specification;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.IdentityModel.Tokens;
 using Store.Data.Entities;
+using Store.Repository.specification.productSpecs;
+using Store.Service.Helper;
 using Store.Service.services.product.Dtos;
 using System;
 using System.Collections.Generic;
@@ -22,7 +24,7 @@ namespace Store.Service.services.product
         public ProductService(IUnitOfWork unitOfWork , IMapper mapper)                 //ingect IUnitOfWork (has instance from rep and function to save operations)
 
         {
-            _UnitOfWork = unitOfWork;                                                 //inject Imapper
+            _UnitOfWork = unitOfWork;                                                   //inject Imapper
             _mapper = mapper;
         }
         public async Task<IReadOnlyList<BrandTybeDetailsDto>> GetAllProductBrandAsync()
@@ -43,10 +45,16 @@ namespace Store.Service.services.product
             return mappedBrands;
 
         }
-        public async Task<IReadOnlyList<productDetailsDto>> GetAllProductsAsync()
+        public async Task<Pagination<productDetailsDto>> GetAllProductsAsync(productspecification input)
 
         {
-            var products = await _UnitOfWork.Repository<Product, int>().GetAllAsync();       //product => productDetailsDto
+            var specs = new productWithSpecification(input);
+
+            var products = await _UnitOfWork.Repository<Product, int>().GetAllWithSpecificationAsync(specs);       //product => productDetailsDto
+
+            var countspecs = new ProductWithCountSpecification(input);
+
+            var count = await _UnitOfWork.Repository<Product, int>().GetCountSpecificationAsync(countspecs);
 
             var mappedproducts = _mapper.Map<IReadOnlyList<productDetailsDto>>(products);
 
@@ -65,13 +73,15 @@ namespace Store.Service.services.product
 
             //}).ToList();
 
-            return mappedproducts;
+            return new Pagination<productDetailsDto>(input.PageIndex,input.PageSize,count,mappedproducts);
 
         }
 
         public async Task<IReadOnlyList<BrandTybeDetailsDto>> GetAllProductTypeAsync()
 
         {
+           
+
             var types = await _UnitOfWork.Repository<ProductType, int>().GetAllAsync();       //product => productDetailsDto
 
             var mappedtypes = _mapper.Map<IReadOnlyList<BrandTybeDetailsDto>>(types);
@@ -96,7 +106,10 @@ namespace Store.Service.services.product
             if (id == null)
                 throw new Exception("Id Is Null");
 
-            var product = await _UnitOfWork.Repository<Product, int>().GetByIdAsync(id);
+            var specs = new productWithSpecification(id);
+
+
+            var product = await _UnitOfWork.Repository<Product, int>().GetWithSpecificationByIdAsync(specs);
 
             if (product == null)
                 throw new Exception("Product Not Found");
@@ -121,7 +134,7 @@ namespace Store.Service.services.product
             return mappedproduct;
 
         }
-     
-          
+
+      
     }
 }

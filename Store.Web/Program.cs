@@ -1,6 +1,4 @@
-﻿using Infrastructure.Interfaces;
-using Infrastructure.Repositories;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Win32;
 using Store.Data.contexts;
 using Store.Service.services.product;
@@ -51,6 +49,8 @@ namespace Store.Web
             }
 
             app.UseHttpsRedirection();
+
+            app.UseStaticFiles();                            //to open imageURl
 
             app.UseAuthorization();
 

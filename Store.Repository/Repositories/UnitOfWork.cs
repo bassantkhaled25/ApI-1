@@ -1,11 +1,9 @@
-﻿
-using Store.Data.Entities;
-using Infrastructure.Interfaces;
+﻿using Store.Data.Entities;
+using Store.Repository.Specification;
 using System.Collections;
 using Store.Data.contexts;
 
-namespace Infrastructure.Repositories
-{
+
     public class UnitOfWork : IUnitOfWork
     {
         private readonly StoreDbContext _context;
@@ -40,7 +38,7 @@ namespace Infrastructure.Repositories
             {
                 var reopsitoryType = typeof(GenericRepository<,>);
 
-                var repositoryInstanse = Activator.CreateInstance(reopsitoryType.MakeGenericType(typeof(TEntity)), _context);  //مسئوله تطلع instance
+                var repositoryInstanse = Activator.CreateInstance(reopsitoryType.MakeGenericType(typeof(TEntity),typeof(TKey)), _context);  //مسئوله تطلع instance
 
                 _repositories.Add(entitytype, repositoryInstanse);
             }
@@ -51,4 +49,4 @@ namespace Infrastructure.Repositories
 
 
     }
-}
+

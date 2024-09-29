@@ -12,8 +12,8 @@ using Store.Data.contexts;
 namespace Store.Data.Migrations
 {
     [DbContext(typeof(StoreDbContext))]
-    [Migration("20240924131452_AddProductTable")]
-    partial class AddProductTable
+    [Migration("20240925144213_addproducttable")]
+    partial class addproducttable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -33,6 +33,9 @@ namespace Store.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("BrandId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -48,10 +51,7 @@ namespace Store.Data.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("ProductBrandId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProductTypeId")
+                    b.Property<int>("TypeId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("createdAt")
@@ -59,9 +59,9 @@ namespace Store.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ProductBrandId");
+                    b.HasIndex("BrandId");
 
-                    b.HasIndex("ProductTypeId");
+                    b.HasIndex("TypeId");
 
                     b.ToTable("Products");
                 });
@@ -108,21 +108,21 @@ namespace Store.Data.Migrations
 
             modelBuilder.Entity("Store.Data.Entities.Product", b =>
                 {
-                    b.HasOne("Store.Data.Entities.ProductBrand", "ProductBrand")
+                    b.HasOne("Store.Data.Entities.ProductBrand", "Brand")
                         .WithMany()
-                        .HasForeignKey("ProductBrandId")
+                        .HasForeignKey("BrandId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Store.Data.Entities.ProductType", "ProductType")
+                    b.HasOne("Store.Data.Entities.ProductType", "Type")
                         .WithMany()
-                        .HasForeignKey("ProductTypeId")
+                        .HasForeignKey("TypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("ProductBrand");
+                    b.Navigation("Brand");
 
-                    b.Navigation("ProductType");
+                    b.Navigation("Type");
                 });
 #pragma warning restore 612, 618
         }

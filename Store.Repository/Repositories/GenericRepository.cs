@@ -1,9 +1,10 @@
-﻿using Infrastructure.Interfaces;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Store.Data.contexts;
 using Store.Data.Entities;
+using Store.Repository.Specification;
 
-namespace Infrastructure.Repositories
+
+namespace Store.Repository.Specification
 {
     public class GenericRepository<TEntity, TKey> : IGenericRepository<TEntity, TKey> where TEntity : BaseEntity<TKey>
     {
@@ -30,5 +31,16 @@ namespace Infrastructure.Repositories
         public void Delete(TEntity entity)
            => _context.Set<TEntity>().Remove(entity);
 
+        public async Task<IReadOnlyList<TEntity>> GetAllWithSpecificationAsync(ISpecification<TEntity> specification)
+           => await ApplySpecification(specification).ToListAsync();
+
+        public async Task<TEntity> GetWithSpecificationByIdAsync(ISpecification<TEntity> specification)
+           => await ApplySpecification(specification).FirstOrDefaultAsync();
+
+        private IQueryable<TEntity> ApplySpecification(ISpecification<TEntity> specification)        //method مجمعه اللي عاوزه
+           => SpecificationEvaluator<TEntity,TKey>.GetQuery(_context.Set<TEntity>(), specification);
+
+        public async Task<int> GetCountSpecificationAsync(ISpecification<TEntity> specification)
+         => await ApplySpecification(specification).CountAsync();
     }
 }

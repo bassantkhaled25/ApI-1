@@ -20,7 +20,7 @@ namespace Store.Service.services.product.Dtos
         public string Resolve(Product source, productDetailsDto destination, string destMember, ResolutionContext context)
         {
             if (!string.IsNullOrEmpty(source.PictureUrl))             
-                return $"{ _configuration["BaseUrl"]} / {source.PictureUrl}";         //concat 
+                return $"{ _configuration["BaseUrl"]}{source.PictureUrl}";         //concat (baseurl => in appsettings) + sourse))
            else
             return null;
         }

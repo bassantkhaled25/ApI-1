@@ -1,10 +1,6 @@
-﻿using Store.Data.Entities;
+﻿using Store.Repository.specification.productSpecs;
+using Store.Service.Helper;
 using Store.Service.services.product.Dtos;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Store.Service.services.product
 {
@@ -13,7 +9,7 @@ namespace Store.Service.services.product
     {
 
         Task<productDetailsDto> GetProductByIdAsync(int? id);
-        Task<IReadOnlyList<productDetailsDto>> GetAllProductsAsync();
+        Task<Pagination<productDetailsDto>> GetAllProductsAsync(productspecification input);
         Task<IReadOnlyList<BrandTybeDetailsDto>> GetAllProductBrandAsync();
         Task<IReadOnlyList<BrandTybeDetailsDto>> GetAllProductTypeAsync();
     }
