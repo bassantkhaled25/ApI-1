@@ -9,9 +9,9 @@ using Store.Repository.Specification;
 
 namespace Store.Repository.specification.productSpecs
 {
-    public class productWithSpecification : BaseSpecification<Product>
+    public class productWithBrandAndTypeSpecification : BaseSpecification<Product>
     {
-        public productWithSpecification(productspecification specs) :         //GetAllProducts  بشتغل ع list          //chaining
+        public productWithBrandAndTypeSpecification(productspecification specs) :         //GetAllProducts  بشتغل ع list          //chaining
 
           base(Product => (!specs.BrandId.HasValue || Product.BrandId == specs.BrandId.Value) &&                 //سواء فيه او لأ 
                          (!specs.TypeId.HasValue || Product.TypeId == specs.TypeId.Value) &&
@@ -45,7 +45,7 @@ namespace Store.Repository.specification.productSpecs
             }
         }
 
-        public productWithSpecification(int? Id) : base (x => x.Id == Id)    //GetById   (not list)     
+        public productWithBrandAndTypeSpecification(int? Id) : base (x => x.Id == Id)    //GetById   (not list)     
             
 
         {             

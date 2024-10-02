@@ -11,7 +11,7 @@ namespace Store.Repository.Specification
     public interface ISpecification<T>
 
     {
-        public Expression<Func<T, bool>> Criteria { get; }                     //where
+        public Expression<Func<T, bool>> Criteria { get; }                     //where(true or false)
         public List<Expression<Func<T, object>>> Includes { get; }             //includes
 
         public Expression<Func<T, object>> OrderBy { get; }

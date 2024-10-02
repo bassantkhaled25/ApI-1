@@ -10,10 +10,10 @@ namespace Store.Repository.Specification
 {
     public class BaseSpecification<T> : ISpecification<T>                 //implement interface
     {
-        public BaseSpecification(Expression<Func<T, bool>> criteria)                     //constructor
+        public BaseSpecification(Expression<Func<T, bool>> criteriaExpression)                     //constructor for criteria
 
         {
-            Criteria = criteria;                                                         //initialize
+            Criteria = criteriaExpression;                                                         //initialize
         }
 
         public Expression<Func<T, bool>> Criteria { get ; }
@@ -32,7 +32,7 @@ namespace Store.Repository.Specification
 
 
 
-        protected void AddInClude(Expression<Func<T, object>> IncludeExpression)      //methodos
+        protected void AddInClude(Expression<Func<T, object>> IncludeExpression)      //methodos for includes
 
           => Includes.Add(IncludeExpression);
 

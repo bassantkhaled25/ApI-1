@@ -48,15 +48,15 @@ namespace Store.Service.services.product
         public async Task<Pagination<productDetailsDto>> GetAllProductsAsync(productspecification input)
 
         {
-            var specs = new productWithSpecification(input);
+            var specs = new productWithBrandAndTypeSpecification(input);
 
-            var products = await _UnitOfWork.Repository<Product, int>().GetAllWithSpecificationAsync(specs);       //product => productDetailsDto
+            var products = await _UnitOfWork.Repository<Product, int>().GetAllWithSpecificationAsync(specs);      
 
             var countspecs = new ProductWithCountSpecification(input);
 
             var count = await _UnitOfWork.Repository<Product, int>().GetCountSpecificationAsync(countspecs);
 
-            var mappedproducts = _mapper.Map<IReadOnlyList<productDetailsDto>>(products);
+            var mappedproducts = _mapper.Map<IReadOnlyList<productDetailsDto>>(products);                             //product => productDetailsDto
 
             //var mappedproducts = products.Select(x => new productDetailsDto
 
@@ -82,7 +82,7 @@ namespace Store.Service.services.product
         {
            
 
-            var types = await _UnitOfWork.Repository<ProductType, int>().GetAllAsync();       //product => productDetailsDto
+            var types = await _UnitOfWork.Repository<ProductType, int>().GetAllAsync();       //types => BrandTybeDetailsDto
 
             var mappedtypes = _mapper.Map<IReadOnlyList<BrandTybeDetailsDto>>(types);
 
@@ -106,7 +106,7 @@ namespace Store.Service.services.product
             if (id == null)
                 throw new Exception("Id Is Null");
 
-            var specs = new productWithSpecification(id);
+            var specs = new productWithBrandAndTypeSpecification(id);
 
 
             var product = await _UnitOfWork.Repository<Product, int>().GetWithSpecificationByIdAsync(specs);
