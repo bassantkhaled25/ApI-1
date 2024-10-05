@@ -9,7 +9,7 @@ namespace Demo.API.Extentions
     public static class IdentityServicesExtentions               //static عشان مش باخد منه object
 
     {
-        public static IServiceCollection AddIdentityServices (this IServiceCollection services )
+        public static IServiceCollection AddIdentityServices (this IServiceCollection services )         //
         {
             var builder = services.AddIdentityCore<AppUser>();             //register identity
 
