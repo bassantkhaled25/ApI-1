@@ -28,7 +28,7 @@ namespace Store.Repository
                     if (Brands != null)
 
                     {
-                       
+
                         await context.ProductBrands.AddRangeAsync(Brands);
 
                     }
@@ -42,7 +42,7 @@ namespace Store.Repository
                         if (Types != null)
 
                         {
-                            
+
                             await context.ProductTypes.AddRangeAsync(Types);
 
                         }
@@ -57,16 +57,33 @@ namespace Store.Repository
                         if (Products != null)
 
                         {
-                 
+
                             await context.Products.AddRangeAsync(Products);
 
                         }
 
-                           await context.SaveChangesAsync();
                     }
+
+                    if (context.DeliveryMethods != null && !context.DeliveryMethods.Any())
+
+                    {
+                        var deliveryMethodsdata = File.ReadAllText("../Store.Repository/SeedData/delivery.json");
+                        var deliveryMethods = JsonSerializer.Deserialize<List<DeliveryMethod>>(deliveryMethodsdata);
+
+                        if (deliveryMethods != null)
+
+                        {
+
+                            await context.DeliveryMethods.AddRangeAsync(deliveryMethods);
+
+                        }
+                    } 
+                    await context.SaveChangesAsync();
+
+
+
                 }
             }
-
 
 
             catch (Exception ex)

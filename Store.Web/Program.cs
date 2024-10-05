@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Demo.API.Extentions;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Win32;
 using StackExchange.Redis;
 using Store.Data.contexts;
+using Store.Data.Entities;
 using Store.Service.HandleResponses;
 using Store.Service.services.product;
 using Store.Service.services.product.Dtos;
@@ -23,13 +25,21 @@ namespace Store.Web
 
             builder.Services.AddControllers();
 
-            builder.Services.AddDbContext<StoreDbContext>(options =>             //register ConnectionString
+            builder.Services.AddDbContext<StoreDbContext>(options =>                //register dbcontext + ConnectionString for dbcontext => DefaultConnection
 
             {
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+               
             });
 
-                                                                                    //Singlton : create one object Shared on the Application
+            builder.Services.AddDbContext<IdentityDbContext>(options =>             //register dbcontext + ConnectionString for dbcontext => IdentityAppDB
+
+            {
+                options.UseSqlServer(builder.Configuration.GetConnectionString("MyIdentityConnection"));
+
+            });
+
+            //Singlton : create one object Shared on the Application
 
             builder.Services.AddSingleton<IConnectionMultiplexer>(config =>              // register connection of redis
             {
@@ -40,6 +50,7 @@ namespace Store.Web
 
             builder.Services.AddApplicationServices();                                  //register services
 
+            builder.Services.AddIdentityServices();
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 
@@ -62,6 +73,8 @@ namespace Store.Web
             app.UseStaticFiles();                                    //for PicURL   //قبل ما اجيب ال route عشان تقرا ال => resource بتاعي
 
             app.UseHttpsRedirection();
+
+            app.UseAuthentication();                               //authentication then autherization
 
             app.UseAuthorization();
 

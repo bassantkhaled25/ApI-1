@@ -1,5 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Store.Data.contexts;
+using Store.Data.Entities.IdentityEntities;
 using Store.Repository;
 
 
@@ -21,9 +23,13 @@ namespace Store.Web.Helper.ApplySeedData
                 {
                     var context = services.GetRequiredService<StoreDbContext>();
 
+                    var userManager = services.GetRequiredService<UserManager<AppUser>>();          //for AppidentityseedData
+
                     await context.Database.MigrateAsync();
 
                     await StoreContextSeed.SeedDataAsync(context, loggerFactory);
+
+                    await AppIdentitySeedData.SeedUserAsync(userManager);
 
                    
                 }

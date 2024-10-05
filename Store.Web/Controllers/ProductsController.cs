@@ -6,10 +6,8 @@ using Store.Service.services.product.Dtos;
 
 namespace Store.Web.Controllers
 {
-    [Route("api/[controller]")]
-
-    [ApiController]
-    public class ProductsController : ControllerBase
+ 
+    public class ProductsController : BaseController
 
     {
 
