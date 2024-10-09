@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using store.Web;
 using Store.Repository.specification.productSpecs;
 using Store.Service.services.product;
@@ -6,7 +7,7 @@ using Store.Service.services.product.Dtos;
 
 namespace Store.Web.Controllers
 {
- 
+    [Authorize]
     public class ProductsController : BaseController
 
     {
