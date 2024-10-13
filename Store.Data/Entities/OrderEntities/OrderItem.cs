@@ -9,6 +9,6 @@ namespace store.Data.OrderEntities
         public decimal Price { get; set; }
         public int Quantity { get; set; }
         public Guid orderId { get; set; }
-        public ProductItemOrdered ProductItem { get; set; }
+        public ProductItemOrdered ProductItem { get; set; }           //as object
     }
 }

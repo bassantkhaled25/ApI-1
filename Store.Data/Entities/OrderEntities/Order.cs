@@ -12,11 +12,11 @@ namespace Store.Data.Entities.OrderEntities
         public DeliveryMethod DeliveryMethod { get; set; }
         public int? DeliveryMethodId {  get; set; } 
         public OrderStatus OrderStatus { get; set; } = OrderStatus.placed;          //default
-        public OrderPaymentStatus PaymentStatus { get; set; }   = OrderPaymentStatus.pending;
+        public OrderPaymentStatus PaymentStatus { get; set; } 
         public IReadOnlyList<OrderItem> OrderItems { get; set; }
         public string? basketId {  get; set; }
         public decimal SubTotal { get; set; }
-        public string PaymentIntentId { get; set; }
+        public string? PaymentIntentId { get; set; }                      //وسيط بيني وبين البنك 
         public decimal GetTotal()
             => SubTotal + DeliveryMethod.Price;
     }

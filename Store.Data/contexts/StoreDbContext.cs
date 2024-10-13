@@ -17,9 +17,11 @@ namespace Store.Data.contexts
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)                   //if has configurations on entities
-        {
-            //modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+        { 
+             
+            modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());         //add config لاي حد بيعمل => implement for this interface
             base.OnModelCreating(modelBuilder);
+        
         }
         public DbSet<Product> Products { get; set; }
         public DbSet<ProductBrand> ProductBrands { get; set; }
