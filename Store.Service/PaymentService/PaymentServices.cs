@@ -24,7 +24,7 @@ namespace Services.PaymentServices
             _unitOfWork = unitOfWork;
             _basketServices = basketServices;
             _config = config;
-            _mapper = mapper;
+            _mapper = mapper;                                         //
         }
 
         public async Task<CustomerBasketDto> CreateOrUpdatePaymentIntent(CustomerBasketDto basket)
