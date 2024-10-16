@@ -7,7 +7,7 @@ namespace store.Services
     {
         Task<OrderDetailsDto> CreateOrderAsync(OrderDto orderDto);
         Task<IReadOnlyList<OrderDetailsDto>> GetAllOrderForUserAsync(string buyerEmail);
-        Task<OrderDetailsDto> GetOrderByIdAsync(Guid id );
+        Task<OrderDetailsDto> GetOrderByIdAsync(Guid id , string buyerEmail );
         Task<IReadOnlyList<DeliveryMethod>> GetAllDeliveryMethodAsync();
     }
 }

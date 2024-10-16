@@ -10,6 +10,7 @@ using Services.BasketServices;
 using Services.TokenServices;
 using store.Services.Dto;
 using store.Services;
+using Services.PaymentServices;
 
 namespace Store.Web.Extentions
 {
@@ -32,7 +33,9 @@ namespace Store.Web.Extentions
 
             Services.AddScoped<ICasheService, CacheService>(); 
 
-            Services.AddScoped<ITokenServices, TokenServices>(); 
+            Services.AddScoped<ITokenServices, TokenServices>();
+            
+            Services.AddScoped<IPaymentServices,PaymentServices>(); 
 
             Services.AddScoped<IUserServices,UserServices>();  
             

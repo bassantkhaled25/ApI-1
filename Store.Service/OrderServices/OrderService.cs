@@ -1,12 +1,16 @@
 ﻿using AutoMapper;
 using Services.OrderServices.Dto;
+using Services.PaymentServices;
 using StackExchange.Redis;
 using store.Data.OrderEntities;
 using store.Repository;
 using store.Services;
 using Store.Data.Entities;
 using Store.Data.Entities.OrderEntities;
+using Store.Repository.specification.OrderSpecs;
 using Store.Service.BasketService;
+using Stripe;
+using Stripe.Climate;
 using Order = Store.Data.Entities.OrderEntities.Order;
 
 namespace Store.Service
@@ -18,14 +22,15 @@ namespace Store.Service
         private readonly IBasketServices _basketService;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-     
-     
-        public OrderService(IBasketServices basketService, IUnitOfWork unitOfWork , IMapper mapper)
+        private readonly IPaymentServices _paymentServices;
+
+        public OrderService(IBasketServices basketService, IUnitOfWork unitOfWork , IMapper mapper, IPaymentServices paymentServices)
 
         {
             _basketService = basketService;
             _unitOfWork = unitOfWork;
             _mapper = mapper;   
+            _paymentServices = paymentServices;
             
         }
 
@@ -45,7 +50,7 @@ namespace Store.Service
             foreach (var item in basket.BasketItems)
 
             {
-                var productItem = await _unitOfWork.Repository<Product, int>().GetByIdAsync(item.Id);
+                var productItem = await _unitOfWork.Repository<Data.Entities.Product, int>().GetByIdAsync(item.Id);
 
                 if (productItem == null)
 
@@ -72,38 +77,55 @@ namespace Store.Service
                 var mappedOrderItem = _mapper.Map<OrderItemDto>(orderitem);
                 OrderItems.Add(mappedOrderItem);
             }
-                //get delivery method
 
-                var deliveryMethod = await _unitOfWork.Repository<DeliveryMethod, int>().GetByIdAsync(orderDto.DeliveryMethodId);
-            
-                if (deliveryMethod == null)
-                    throw new Exception("Delivery Method Not Provided");
+            //get delivery method
 
-                //calculate subtotal
+            var deliveryMethod = await _unitOfWork.Repository<DeliveryMethod, int>().GetByIdAsync(orderDto.DeliveryMethodId);
 
-                var subTotal = OrderItems.Sum(item => item.Price * item.Quantity);
+            if (deliveryMethod == null)
+                throw new Exception("Delivery Method Not Provided");
 
-                //create order
+            //calculate subtotal
 
-                var mappedShippingaddress = _mapper.Map<ShippingAddress>(orderDto.ShippingAddress);
-                var mappedorderitems = _mapper.Map<List<OrderItem>>(OrderItems);
-                var Order = new Order
-                {
-                    DeliveryMethodId = deliveryMethod.Id,
-                    ShippingAddress = mappedShippingaddress,
-                    BuyerEmail = orderDto.BuyerEmail,
-                    basketId = orderDto.BasketId,
-                    OrderItems = mappedorderitems,
-                    SubTotal = subTotal
+            var subTotal = OrderItems.Sum(item => item.Price * item.Quantity);
 
-                };
+            //payment 
+
+            var specs = new OrderWithPaymentspecification(basket.PaymentIntentId);
+
+            var existingOrder = await _unitOfWork.Repository<Order,Guid>().GetWithSpecificationByIdAsync(specs);
+
+            if (existingOrder == null)
+
+            {              
+                await _paymentServices.CreateOrUpdatePaymentIntent(basket);
+            }
+
+            //create order
+
+            var mappedShippingaddress = _mapper.Map<ShippingAddress>(orderDto.ShippingAddress);
+
+            var mappedorderitems = _mapper.Map<List<OrderItem>>(OrderItems);
+
+            var Order = new Order
+
+            {
+                DeliveryMethodId = deliveryMethod.Id,
+                ShippingAddress = mappedShippingaddress,
+                BuyerEmail = orderDto.BuyerEmail,
+                basketId = orderDto.BasketId,
+                OrderItems = mappedorderitems,
+                SubTotal = subTotal,
+                PaymentIntentId=basket.PaymentIntentId,
+
+            };
 
 
-                await _unitOfWork.Repository<Order, Guid>().AddAsync(Order);
-                await _unitOfWork.CompeleteAsync();
-                var mappedorder = _mapper.Map<OrderDetailsDto>(Order);
-                return mappedorder;
-            
+            await _unitOfWork.Repository<Order, Guid>().AddAsync(Order);
+            await _unitOfWork.CompeleteAsync();
+            var mappedorder = _mapper.Map<OrderDetailsDto>(Order);
+            return mappedorder;
+        
 
         }
 
@@ -111,16 +133,16 @@ namespace Store.Service
 
          => await _unitOfWork.Repository<DeliveryMethod, int>().GetAllAsync();
 
-        public async Task<IReadOnlyList<OrderDetailsDto>> GetAllOrderForUserAsync(string buyerEmail)
 
+        public async Task<IReadOnlyList<OrderDetailsDto>> GetAllOrderForUserAsync(string buyerEmail)
         {
             var specs = new OrderWithSpecification(buyerEmail);
 
             var orders = await _unitOfWork.Repository<Order,Guid>().GetAllWithSpecificationAsync(specs);
 
-            if (!orders.Any())
+            if (!orders.Any())                                  //or == if (order is { Count: <= 0 })
 
-                throw new Exception("You Donot Have Any Orders Yet!!");
+              throw new Exception("You Do Not Have Any Orders Yet");
 
             var mappedOrders = _mapper.Map<List<OrderDetailsDto>>(orders);
 
@@ -128,10 +150,10 @@ namespace Store.Service
         }
 
 
-        public async Task<OrderDetailsDto> GetOrderByIdAsync(Guid id)
+        public async Task<OrderDetailsDto> GetOrderByIdAsync(Guid id, string buyerEmail )
 
         {
-            var specs = new OrderWithSpecification(id);
+            var specs = new OrderWithSpecification(id,buyerEmail);
 
             var order = await _unitOfWork.Repository<Order,Guid>().GetWithSpecificationByIdAsync(specs);
 

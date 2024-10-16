@@ -13,8 +13,8 @@ namespace store.Repository
             AddOrderByDescending(order => order.OrderDate);
         }
 
-        public OrderWithSpecification(Guid id)                        //incase return one
-                : base(order => order.Id == id)
+        public OrderWithSpecification(Guid id, string buyerEmail)                        //incase return one
+                : base(order => order.BuyerEmail == buyerEmail && order.Id == id)
         {
             AddInClude(order => order.DeliveryMethod);
             AddInClude(order => order.OrderItems);

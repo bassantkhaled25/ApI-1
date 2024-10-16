@@ -29,7 +29,7 @@ namespace Store.Web
 
             {
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
-               
+
             });
 
             builder.Services.AddDbContext<IdentityDbContext>(options =>             //register dbcontext + ConnectionString for dbcontext => IdentityAppDB
@@ -41,7 +41,7 @@ namespace Store.Web
 
             //Singlton : create one object Shared on the Application
 
-            builder.Services.AddSingleton<IConnectionMultiplexer>(config =>              // register connection of redis
+            builder.Services.AddSingleton<IConnectionMultiplexer>(config =>                                  // register connection of redis
             {
                 var configuration = ConfigurationOptions.Parse(builder.Configuration.GetConnectionString("Redis"));   //key(redis)
                 return ConnectionMultiplexer.Connect(configuration);
@@ -58,7 +58,21 @@ namespace Store.Web
 
             /*builder.Services.AddSwaggerGen();  */                                     //هعمل ليها extension
 
-            builder.Services.AddSwaggerserviceExtention();                                                              
+            builder.Services.AddSwaggerserviceExtention();
+
+
+            builder.Services.AddCors(options =>
+
+            {
+              options.AddPolicy("CorsPolicy", Policy =>
+
+              {
+
+                   Policy.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:4200", "http://localhost:42800");
+              });
+
+            });
+        
 
             var app = builder.Build();
 
@@ -74,6 +88,8 @@ namespace Store.Web
             app.UseMiddleware<ExceptionMiddleWare>();                         //  قبل ما يروح ع اي حاجه => using middleware <ExceptionMiddleWare>
 
             app.UseStaticFiles();                                    //for PicURL   //قبل ما اجيب ال route عشان تقرا ال => resource بتاعي
+
+            app.UseCors("CorsPolicy");
 
             app.UseHttpsRedirection();
 

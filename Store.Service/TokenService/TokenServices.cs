@@ -8,6 +8,7 @@ using System.Text;
 namespace Services.TokenServices
 {
     public class TokenServices : ITokenServices
+
     {
         private readonly IConfiguration _config;
         private readonly SymmetricSecurityKey _key;
